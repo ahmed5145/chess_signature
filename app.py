@@ -11,6 +11,100 @@ from make_signature import build_html_pair
 
 MAX_ACCOUNTS = 6
 
+PAGE_CSS = """
+<style>
+  /* Clear Streamlit top chrome so the hero border is not clipped */
+  .block-container {
+    padding-top: 3.25rem !important;
+    padding-bottom: 4rem !important;
+    max-width: 920px;
+  }
+  [data-testid="stHeader"] {
+    background: transparent;
+  }
+  [data-testid="stToolbar"] { right: 1rem; }
+  #MainMenu { visibility: hidden; }
+  footer { visibility: hidden; }
+  /* Drop default empty top gap that fights our padding */
+  div[data-testid="stVerticalBlock"] > div:first-child { gap: 0.5rem; }
+
+  .cs-hero {
+    background: linear-gradient(160deg, #161a24 0%, #13161d 55%, #10131a 100%);
+    border: 1px solid #2a3142;
+    border-radius: 16px;
+    padding: 1.5rem 1.6rem 1.35rem;
+    margin: 0 0 1.75rem 0;
+    box-sizing: border-box;
+  }
+  .cs-kicker {
+    color: #8b93a7;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 0.72rem;
+    margin: 0 0 0.45rem 0;
+  }
+  .cs-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #b07d2e;
+    letter-spacing: -0.4px;
+    margin: 0 0 0.45rem 0;
+    line-height: 1.15;
+  }
+  .cs-sub {
+    color: #a0a7b8;
+    font-size: 0.98rem;
+    margin: 0;
+    line-height: 1.45;
+    max-width: 40rem;
+  }
+  .cs-pill-row {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .cs-pill {
+    border: 1px solid #2a3142;
+    color: #c5cad6;
+    border-radius: 999px;
+    padding: 0.22rem 0.7rem;
+    font-size: 0.78rem;
+    background: rgba(11,13,17,0.45);
+  }
+  .cs-note {
+    color: #8b93a7;
+    font-size: 0.85rem;
+    margin: 0.75rem 0 0 0;
+    line-height: 1.4;
+  }
+  .cs-footer {
+    color: #5b6172;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #1e2330;
+  }
+  .cs-footer a { color: #8b93a7; text-decoration: none; }
+  .cs-footer a:hover { color: #b07d2e; }
+
+  /* Tighter, quieter form controls */
+  div[data-testid="stTextInput"] label {
+    color: #c5cad6 !important;
+    font-weight: 500 !important;
+  }
+  div[data-testid="stExpander"] {
+    border: 1px solid #1e2330 !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+  }
+  div[data-testid="stExpander"] details {
+    border: none !important;
+  }
+</style>
+"""
+
 
 def parse_usernames(raw: str) -> list[str]:
     """Trim, drop blanks, dedupe case-insensitively, preserve first spelling."""
@@ -57,21 +151,60 @@ def cache_key(chesscom, lichess, token, max_games):
     )
 
 
-def main():
-    st.set_page_config(page_title="Chess Signature", page_icon="♟", layout="wide")
-    st.title("Chess Signature")
-    st.caption("Paste your usernames. Get one shareable chess personality page.")
+def render_hero():
+    st.markdown(
+        """
+        <div class="cs-hero">
+          <div class="cs-kicker">Chess analytics</div>
+          <div class="cs-title">Chess Signature</div>
+          <p class="cs-sub">
+            Public games in. One personality page out. Screenshot it, download it,
+            send it to a friend.
+          </p>
+          <div class="cs-pill-row">
+            <span class="cs-pill">Personality card</span>
+            <span class="cs-pill">GM double</span>
+            <span class="cs-pill">Board heatmaps</span>
+            <span class="cs-pill">Openings &amp; streaks</span>
+            <span class="cs-pill">Offline HTML</span>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
+
+def main():
+    st.set_page_config(
+        page_title="Chess Signature",
+        page_icon="♟",
+        layout="centered",
+        initial_sidebar_state="collapsed",
+        menu_items={
+            "Get help": "https://github.com/ahmed5145/chess_signature",
+            "Report a bug": "https://github.com/ahmed5145/chess_signature/issues",
+            "About": (
+                "Chess Signature builds a personality report from your public "
+                "Chess.com and Lichess games."
+            ),
+        },
+    )
+    st.markdown(PAGE_CSS, unsafe_allow_html=True)
+    render_hero()
+
+    # Stacked fields: avoids Streamlit column label misalignment
     chesscom_raw = st.text_input(
-        "Chess.com usernames (comma separated)",
-        placeholder="e.g. Hikaru, GothamChess",
+        "Chess.com usernames",
+        placeholder="comma-separated, e.g. Hikaru",
+        help="Up to 6 accounts total across both sites.",
     )
     lichess_raw = st.text_input(
-        "Lichess usernames (comma separated)",
-        placeholder="e.g. drnykterstein",
+        "Lichess usernames",
+        placeholder="comma-separated, e.g. drnykterstein",
+        help="Optional. Same 6-account cap shared with Chess.com.",
     )
 
-    with st.expander("Advanced"):
+    with st.expander("Advanced options"):
         lichess_token = st.text_input(
             "Lichess API token (optional)",
             type="password",
@@ -89,23 +222,23 @@ def main():
         st.session_state.report_cache = {}
 
     generate = st.button("Generate report", type="primary")
-    st.caption(
-        "Fetch can take a few minutes for large accounts. Times are UTC. "
-        "This is for fun, not an engine analysis."
+    st.markdown(
+        '<p class="cs-note">Large accounts can take a few minutes. '
+        "Times are UTC. Style matches are for fun, not engine strength.</p>",
+        unsafe_allow_html=True,
     )
 
     chesscom = parse_usernames(chesscom_raw)
     lichess = parse_usernames(lichess_raw)
-
     active = None
 
     if generate:
         if not chesscom and not lichess:
             st.error("Enter at least one Chess.com or Lichess username.")
-            return
+            st.stop()
         if len(chesscom) + len(lichess) > MAX_ACCOUNTS:
             st.error(f"Cap is {MAX_ACCOUNTS} accounts total. Trim the list and try again.")
-            return
+            st.stop()
 
         key = cache_key(chesscom, lichess, lichess_token, lichess_max)
         cached = st.session_state.report_cache.get(key)
@@ -137,7 +270,7 @@ def main():
                     f"No games found for {named}. "
                     "Check the spelling, or whether the account is private / has no public games."
                 )
-                return
+                st.stop()
 
             missing = empty_accounts(chesscom, lichess, games)
             if missing:
@@ -147,7 +280,7 @@ def main():
                     + ". Building the report from the accounts that did return games."
                 )
 
-            with st.spinner("Building report (board walk + charts)..."):
+            with st.spinner("Building report..."):
                 html, offline_html = build_html_pair(games)
 
             cached = {
@@ -167,14 +300,25 @@ def main():
 
     if active:
         games = active["games"]
-        st.success(f"Report ready from {len(games):,} games.")
-        st.download_button(
-            "Download report",
-            data=active["offline_html"].encode("utf-8"),
-            file_name="chess_signature.html",
-            mime="text/html",
-        )
+        top_l, top_r = st.columns([3, 1])
+        with top_l:
+            st.success(f"Report ready from {len(games):,} games.")
+        with top_r:
+            st.download_button(
+                "Download HTML",
+                data=active["offline_html"].encode("utf-8"),
+                file_name="chess_signature.html",
+                mime="text/html",
+                use_container_width=True,
+            )
         components.html(active["html"], height=6000, scrolling=True)
+
+    st.markdown(
+        '<p class="cs-footer">Open source on GitHub · '
+        '<a href="https://github.com/ahmed5145/chess_signature">'
+        "ahmed5145/chess_signature</a></p>",
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":
