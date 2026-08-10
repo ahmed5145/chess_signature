@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+games_cache.json
+games_cache.json.tmp
+chess_signature.html
+.streamlit/secrets.toml
