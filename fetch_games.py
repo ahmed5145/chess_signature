@@ -19,8 +19,8 @@ import requests
 # ---------------------------------------------------------------------------
 # CONFIG -- put your own usernames here. Add as many as you want to each list.
 # ---------------------------------------------------------------------------
-CHESSCOM_USERS = ["AhmeedM1", "AhmeddM1", "JustAcceptDraw"]           # e.g. ["AhmeedM1", "my_old_account"]
-LICHESS_USERS = ["ahmed56781"]                       # e.g. ["my_lichess_name", "another"]
+CHESSCOM_USERS = []           # e.g. ["MyChessComName", "old_account"]
+LICHESS_USERS = []            # e.g. ["MyLichessName"]
 
 # Optional: a Lichess personal API token (https://lichess.org/account/oauth/token)
 # raises your rate limit. Not required. Set LICHESS_TOKEN in your env if you have one.
@@ -31,7 +31,7 @@ LICHESS_MAX_GAMES = 8000
 
 CACHE_FILE = "games_cache.json"
 # Chess.com requires a descriptive User-Agent with contact info.
-UA = "chess-signature/1.0 (personal analytics; contact: chess-signature@localhost)"
+UA = "chess-signature/1.0 (https://github.com/ahmed5145/chess_signature; personal analytics)"
 # ---------------------------------------------------------------------------
 
 
