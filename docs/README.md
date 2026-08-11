@@ -1,5 +1,11 @@
 # Docs assets
 
-- `preview.png` — README hero preview (use PNG; GitHub often blanks SVGs)
-- `preview.svg` — vector source of the same card
-- Optional: upload `preview.png` under GitHub **Settings → General → Social preview**
+Real report screenshots used in the README and for GitHub social preview.
+
+| File | Use |
+|------|-----|
+| `preview.png` | Main README hero (personality card) |
+| `social-preview.png` | GitHub Settings → Social preview upload |
+| `preview-stats.png` | Stats / streaks / fun counters strip |
+| `preview-rating.png` | Rating + activity charts |
+| `preview.svg` | Optional vector mock (not used in README; GitHub blanks many SVGs) |

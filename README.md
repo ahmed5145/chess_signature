@@ -11,7 +11,7 @@ Paste one or more usernames, wait for the fetch, get a full HTML report you can 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml)
 
-![Chess Signature personality card preview](docs/preview.png)
+![Chess Signature personality card](docs/preview.png)
 
 ## What you get
 
@@ -23,6 +23,11 @@ Paste one or more usernames, wait for the fetch, get a full HTML report you can 
 - Offline HTML download (Plotly bundled)
 
 Style axes are heuristics from your games only. No engine eval, no API keys required for Chess.com.
+
+<p align="center">
+  <img src="docs/preview-stats.png" alt="Stats and streaks" width="48%" />
+  <img src="docs/preview-rating.png" alt="Rating and activity charts" width="48%" />
+</p>
 
 ## Try it online
 
