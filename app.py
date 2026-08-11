@@ -311,7 +311,7 @@ def main():
                 mime="text/html",
                 use_container_width=True,
             )
-        components.html(active["html"], height=6000, scrolling=True)
+        components.html(active["html"], height=14000, scrolling=True)
 
     st.markdown(
         '<p class="cs-footer">Open source on GitHub · '

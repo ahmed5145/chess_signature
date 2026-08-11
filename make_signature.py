@@ -596,13 +596,16 @@ def fig_board(matrix, title, subtitle, colorscale):
     ))
     fig.update_layout(
         title=dict(
-            text=f"{title}<br><span style='font-size:13px;color:{MUTED}'>{subtitle}</span>",
-            font=dict(size=20, color=INK),
+            text=f"{title}<br><span style='font-size:12px;color:{MUTED}'>{subtitle}</span>",
+            font=dict(size=18, color=INK),
+            x=0.02, xanchor="left",
         ),
         xaxis=dict(showgrid=False, zeroline=False, side="bottom", tickfont=dict(color=MUTED)),
-        yaxis=dict(showgrid=False, zeroline=False, scaleanchor="x", tickfont=dict(color=MUTED)),
+        yaxis=dict(showgrid=False, zeroline=False, scaleanchor="x", tickfont=dict(color=MUTED),
+                   constrain="domain"),
         paper_bgcolor=PANEL, plot_bgcolor=PANEL,
-        height=520, margin=dict(l=40, r=40, t=90, b=40),
+        height=480, margin=dict(l=40, r=20, t=80, b=40),
+        autosize=True,
     )
     return fig
 
@@ -648,8 +651,9 @@ def fig_openings(df):
         insidetextorientation="radial",
     ))
     fig.update_layout(
-        title=dict(text="Your openings, colored by how often they win", font=dict(size=20, color=INK)),
-        paper_bgcolor=PANEL, height=560, margin=dict(l=10, r=10, t=70, b=10),
+        title=dict(text="Openings by win rate", font=dict(size=20, color=INK)),
+        paper_bgcolor=PANEL, height=620, margin=dict(l=20, r=20, t=70, b=40),
+        autosize=True,
     )
     return fig
 
@@ -675,7 +679,9 @@ def fig_rating(df):
         paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=420,
         xaxis=dict(gridcolor="#20242e", tickfont=dict(color=MUTED)),
         yaxis=dict(gridcolor="#20242e", tickfont=dict(color=MUTED)),
-        legend=dict(font=dict(color=MUTED)), margin=dict(l=50, r=30, t=70, b=40),
+        legend=dict(font=dict(color=MUTED), orientation="h", yanchor="bottom", y=1.02),
+        margin=dict(l=50, r=40, t=90, b=40),
+        autosize=True,
     )
     return fig
 
@@ -690,11 +696,14 @@ def fig_results_by_color(df):
         ))
     fig.update_layout(
         barmode="stack",
-        title=dict(text="Results by color", font=dict(size=20, color=INK)),
-        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=380,
+        title=dict(text="Results by color", font=dict(size=18, color=INK)),
+        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=400,
         xaxis=dict(tickfont=dict(color=MUTED)),
-        yaxis=dict(gridcolor="#20242e", tickfont=dict(color=MUTED)),
-        legend=dict(font=dict(color=MUTED)), margin=dict(l=50, r=30, t=70, b=40),
+        yaxis=dict(gridcolor="#20242e", tickfont=dict(color=MUTED),
+                   title=dict(text="games", font=dict(color=MUTED))),
+        legend=dict(font=dict(color=MUTED)),
+        margin=dict(l=50, r=20, t=70, b=40),
+        autosize=True,
     )
     return fig
 
@@ -715,10 +724,12 @@ def fig_time_heatmap(df):
         hovertemplate="%{y} %{x}:00 UTC<br>%{z} games<extra></extra>",
     ))
     fig.update_layout(
-        title=dict(text="When you play (volume by day &amp; hour, UTC)", font=dict(size=20, color=INK)),
-        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=340,
-        xaxis=dict(tickfont=dict(color=MUTED)), yaxis=dict(tickfont=dict(color=MUTED)),
-        margin=dict(l=50, r=30, t=70, b=40),
+        title=dict(text="When you play (UTC)", font=dict(size=18, color=INK)),
+        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=400,
+        xaxis=dict(tickfont=dict(color=MUTED), title=dict(text="hour", font=dict(color=MUTED))),
+        yaxis=dict(tickfont=dict(color=MUTED)),
+        margin=dict(l=50, r=20, t=70, b=50),
+        autosize=True,
     )
     return fig
 
@@ -740,13 +751,14 @@ def fig_winrate_by_hour(df):
         hovertemplate="hour %{x}:00 UTC<br>win rate %{y:.1f}%<extra></extra>",
     ))
     fig.update_layout(
-        title=dict(text="Win rate by hour of day (UTC)", font=dict(size=20, color=INK)),
-        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=340,
+        title=dict(text="Win rate by hour (UTC)", font=dict(size=18, color=INK)),
+        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=400,
         xaxis=dict(tickfont=dict(color=MUTED),
                    title=dict(text="hour (UTC)", font=dict(color=MUTED))),
         yaxis=dict(gridcolor="#20242e", tickfont=dict(color=MUTED), range=[0, 100],
                    title=dict(text="win %", font=dict(color=MUTED))),
-        margin=dict(l=50, r=30, t=70, b=50),
+        margin=dict(l=50, r=20, t=70, b=50),
+        autosize=True,
     )
     return fig
 
@@ -756,19 +768,39 @@ def fig_first_moves(stats):
     if not c:
         return None
     order = ["e4", "d4", "Nf3", "c4", "other"]
-    labels = [k for k in order if c.get(k)]
-    values = [c[k] for k in labels]
-    fig = go.Figure(go.Pie(
-        labels=labels, values=values, hole=0.45,
-        marker=dict(colors=[GOLD, "#5a8fb0", GREEN, "#a05ab0", GREY]),
-        textinfo="label+percent",
-        hovertemplate="%{label}: %{value} games (%{percent})<extra></extra>",
+    color_map = {
+        "e4": GOLD,
+        "d4": "#5a8fb0",
+        "Nf3": GREEN,
+        "c4": "#a05ab0",
+        "other": GREY,
+    }
+    rows = [(k, int(c[k])) for k in order if c.get(k)]
+    if not rows:
+        return None
+    # Ascending so the dominant first move sits at the top of a horizontal bar.
+    rows.sort(key=lambda t: t[1])
+    labels = [r[0] for r in rows]
+    values = [r[1] for r in rows]
+    total = sum(values) or 1
+    fig = go.Figure(go.Bar(
+        y=labels,
+        x=values,
+        orientation="h",
+        marker_color=[color_map.get(lab, GREY) for lab in labels],
+        text=[f"{v / total * 100:.1f}%" for v in values],
+        textposition="outside",
+        cliponaxis=False,
+        hovertemplate="%{y}: %{x} games<extra></extra>",
     ))
     fig.update_layout(
-        title=dict(text="First move as White", font=dict(size=20, color=INK)),
-        paper_bgcolor=PANEL, height=380,
-        legend=dict(font=dict(color=MUTED)),
-        margin=dict(l=30, r=30, t=70, b=30),
+        title=dict(text="First move as White", font=dict(size=18, color=INK)),
+        paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=400,
+        xaxis=dict(tickfont=dict(color=MUTED), gridcolor="#20242e",
+                   title=dict(text="games", font=dict(color=MUTED))),
+        yaxis=dict(tickfont=dict(color=MUTED)),
+        margin=dict(l=60, r=70, t=70, b=40),
+        autosize=True,
     )
     return fig
 
@@ -800,12 +832,13 @@ def fig_weapons_nemeses(df, min_games=20):
             hovertemplate="%{y}<br>%{x:.1f}% win (%{customdata[1]}/%{customdata[0]})<extra></extra>",
         ))
         fig.update_layout(
-            title=dict(text=title, font=dict(size=18, color=INK)),
-            paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=320,
+            title=dict(text=title, font=dict(size=16, color=INK)),
+            paper_bgcolor=PANEL, plot_bgcolor=PANEL, height=340,
             xaxis=dict(range=[0, 100], gridcolor="#20242e", tickfont=dict(color=MUTED),
                        title=dict(text="win %", font=dict(color=MUTED))),
-            yaxis=dict(tickfont=dict(color=MUTED)),
-            margin=dict(l=10, r=20, t=60, b=40),
+            yaxis=dict(tickfont=dict(color=MUTED), automargin=True),
+            margin=dict(l=20, r=20, t=60, b=40),
+            autosize=True,
         )
         return fig
 
@@ -1085,12 +1118,12 @@ def assemble_html(df, activity, captures, stats, axes, code, archetype, gm1, gm2
     figs = [
         fig_board(
             activity, "Where your pieces live",
-            "how often your pieces land on each square, from your side of the board",
+            "landing squares from your side",
             [[0, PANEL], [0.4, "#3a4a6a"], [1, "#7fb0ff"]],
         ),
         fig_board(
             captures, "Where your pieces die",
-            "squares where your pieces most often get captured, from your side",
+            "capture squares from your side",
             [[0, PANEL], [0.4, "#6a3a3a"], [1, "#ff7f7f"]],
         ),
         fig_openings(df),
@@ -1174,7 +1207,8 @@ def assemble_html(df, activity, captures, stats, axes, code, archetype, gm1, gm2
   .card .val{{font-size:26px;font-weight:600;color:{GOLD};}}
   .card .val.small{{font-size:18px;line-height:1.25;}}
   .card .lab{{font-size:12px;color:{MUTED};text-transform:uppercase;letter-spacing:0.6px;margin-top:4px;}}
-  .panel{{background:{PANEL};border:1px solid #1e2330;border-radius:14px;padding:10px 14px;margin-bottom:22px;}}
+  .panel{{background:{PANEL};border:1px solid #1e2330;border-radius:14px;padding:10px 14px;margin-bottom:22px;overflow:visible;}}
+  .panel .js-plotly-plot,.panel .plotly-graph-div{{max-width:100%;}}
   .text-panel{{padding:18px 20px;}}
   .panel-h{{font-size:18px;font-weight:600;margin-bottom:8px;}}
   .big{{font-size:28px;font-weight:600;color:{GOLD};}}
@@ -1182,7 +1216,8 @@ def assemble_html(df, activity, captures, stats, axes, code, archetype, gm1, gm2
   .section-title{{font-size:20px;font-weight:600;margin:8px 0 14px;}}
   ul.clean{{margin:10px 0 0;padding-left:18px;color:{INK};}}
   ul.clean li{{margin:6px 0;}}
-  .grid2{{display:grid;grid-template-columns:1fr 1fr;gap:22px;}}
+  .grid2{{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start;}}
+  .grid2 > .panel{{min-width:0;}}
   .footer{{color:{MUTED};font-size:13px;margin-top:12px;text-align:center;}}
   @media(max-width:820px){{
     .grid2,.meters,.cards,.cards.fun{{grid-template-columns:1fr;}}
