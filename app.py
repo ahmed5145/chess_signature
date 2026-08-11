@@ -6,6 +6,7 @@ Run:  streamlit run app.py
 import streamlit as st
 import streamlit.components.v1 as components
 
+import report_cache
 from fetch_games import fetch_all
 from make_signature import build_html_pair
 
@@ -142,7 +143,7 @@ def empty_accounts(chesscom, lichess, games):
     return missing
 
 
-def cache_key(chesscom, lichess, token, max_games):
+def session_key(chesscom, lichess, token, max_games):
     return (
         tuple(sorted(u.lower() for u in chesscom)),
         tuple(sorted(u.lower() for u in lichess)),
@@ -192,7 +193,6 @@ def main():
     st.markdown(PAGE_CSS, unsafe_allow_html=True)
     render_hero()
 
-    # Stacked fields: avoids Streamlit column label misalignment
     chesscom_raw = st.text_input(
         "Chess.com usernames",
         placeholder="comma-separated, e.g. Hikaru",
@@ -217,20 +217,27 @@ def main():
             value=5000,
             step=500,
         )
+        force_refresh = st.checkbox(
+            "Force refresh (ignore server cache)",
+            value=False,
+            help="Bypass the shared server cache and fetch games again.",
+        )
 
     if "report_cache" not in st.session_state:
         st.session_state.report_cache = {}
 
     generate = st.button("Generate report", type="primary")
     st.markdown(
-        '<p class="cs-note">Large accounts can take a few minutes. '
-        "Times are UTC. Style matches are for fun, not engine strength.</p>",
+        '<p class="cs-note">Large accounts can take a few minutes on first run. '
+        "Repeat lookups for the same usernames reuse a server cache for about "
+        "6 hours. Times are UTC. Style matches are for fun, not engine strength.</p>",
         unsafe_allow_html=True,
     )
 
     chesscom = parse_usernames(chesscom_raw)
     lichess = parse_usernames(lichess_raw)
     active = None
+    cache_note = None
 
     if generate:
         if not chesscom and not lichess:
@@ -240,10 +247,21 @@ def main():
             st.error(f"Cap is {MAX_ACCOUNTS} accounts total. Trim the list and try again.")
             st.stop()
 
-        key = cache_key(chesscom, lichess, lichess_token, lichess_max)
-        cached = st.session_state.report_cache.get(key)
+        key = session_key(chesscom, lichess, lichess_token, lichess_max)
+        cid = report_cache.cache_id(chesscom, lichess, lichess_token or "", lichess_max)
+        cached = None if force_refresh else st.session_state.report_cache.get(key)
+
+        if cached is None and not force_refresh:
+            disk_hit = report_cache.load_report(cid)
+            if disk_hit is not None:
+                cached = disk_hit
+                st.session_state.report_cache[key] = cached
+                cache_note = "Loaded from server cache (shared across sessions, ~6h TTL)."
 
         if cached is None:
+            if force_refresh:
+                report_cache.clear_report(cid)
+
             progress_bar = st.progress(0, text="Starting fetch...")
             status_box = st.status("Fetching games...", expanded=True)
 
@@ -289,8 +307,10 @@ def main():
                 "offline_html": offline_html,
             }
             st.session_state.report_cache[key] = cached
-        else:
-            st.info("Using cached report for this username set (same session).")
+            report_cache.save_report(cid, cached)
+            cache_note = "Fetched fresh and saved to server cache."
+        elif cache_note is None:
+            cache_note = "Using cached report for this username set (this session)."
 
         st.session_state["active_key"] = key
         active = cached
@@ -300,6 +320,8 @@ def main():
 
     if active:
         games = active["games"]
+        if cache_note:
+            st.caption(cache_note)
         top_l, top_r = st.columns([3, 1])
         with top_l:
             st.success(f"Report ready from {len(games):,} games.")
