@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Import check
+        run: |
+          python -m py_compile app.py fetch_games.py make_signature.py
+          python -c "import fetch_games; import make_signature; print('imports ok')"
+
+      - name: Tiny report smoke test
+        run: |
+          python - <<'PY'
+          from make_signature import build_html
+
+          sample = [{
+              "platform": "chess.com",
+              "account": "DemoPlayer",
+              "id": "demo-1",
+              "_month": "",
+              "played_at": "2024-06-01T12:00:00+00:00",
+              "time_class": "blitz",
+              "color": "white",
+              "user_rating": 1500,
+              "opp_rating": 1480,
+              "result": "win",
+              "termination": "resigned",
+              "eco": "B20",
+              "opening": "Sicilian Defense",
+              "pgn": "",
+              "moves": "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6",
+              "clocks": None,
+          }, {
+              "platform": "lichess",
+              "account": "DemoPlayer",
+              "id": "demo-2",
+              "_month": "",
+              "played_at": "2024-06-02T18:00:00+00:00",
+              "time_class": "rapid",
+              "color": "black",
+              "user_rating": 1510,
+              "opp_rating": 1520,
+              "result": "loss",
+              "termination": "resign",
+              "eco": "D00",
+              "opening": "Queen's Pawn Opening",
+              "pgn": "",
+              "moves": "d4 Nf6 c4 e6 Nc3 Bb4",
+              "clocks": None,
+          }]
+          html = build_html(sample, embed_plotly=False)
+          assert "Chess Signature" in html
+          assert "Chess personality card" in html
+          assert "\ufffd" not in html
+          print(f"smoke ok ({len(html)} chars)")
+          PY

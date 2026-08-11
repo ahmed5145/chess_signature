@@ -6,13 +6,16 @@ Turn your Chess.com and Lichess games into a shareable chess personality report.
 
 Paste one or more usernames, wait for the fetch, get a full HTML report you can screenshot or download.
 
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Streamlit](https://img.shields.io/badge/streamlit-live-FF4B4B)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/streamlit-live-FF4B4B)](https://chess-signature.streamlit.app/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![CI](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml)
+
+![Chess Signature personality card preview](docs/preview.svg)
 
 ## What you get
 
-- Personality card with a 4-letter style code and a tongue-in-cheek GM double
+- Personality card with a 4-letter style code and a playful GM double
 - Board heatmaps (where your pieces land and die)
 - Opening repertoire, weapons, and nemeses
 - Rating curves, streaks, color edge, win rate by hour (UTC)
@@ -70,6 +73,7 @@ python fetch_games.py
 | `fetch_games.py` | Chess.com + Lichess fetch (`fetch_all`) |
 | `make_signature.py` | Report builder (`build_html`) |
 | `requirements.txt` | Dependencies |
+| `.github/workflows/ci.yml` | Import + tiny report smoke test |
 
 ## Notes
 

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Chess Signature personality card preview">
+  <rect width="1280" height="720" fill="#0b0d11"/>
+  <rect x="48" y="40" width="1184" height="640" rx="18" fill="#13161d" stroke="#2a3142"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6a4a1e"/>
+      <stop offset="100%" stop-color="#b07d2e"/>
+    </linearGradient>
+  </defs>
+
+  <text x="88" y="92" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" letter-spacing="2">CHESS PERSONALITY CARD</text>
+  <text x="88" y="150" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="700">The Speed Explorer</text>
+  <rect x="88" y="172" width="96" height="36" rx="8" fill="none" stroke="#b07d2e"/>
+  <text x="136" y="196" text-anchor="middle" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="3">ATPX</text>
+
+  <line x1="88" y1="236" x2="1192" y2="236" stroke="#242a38"/>
+  <text x="88" y="268" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" letter-spacing="1">YOUR GM DOUBLE</text>
+  <text x="88" y="304" fill="#e6e6e6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="600">Mikhail Tal</text>
+  <text x="88" y="334" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Runner-up: Garry Kasparov</text>
+  <text x="88" y="362" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-style="italic">For fun, based on your style and openings, not an engine comparison.</text>
+
+  <rect x="88" y="388" width="340" height="58" rx="10" fill="#0b0d11" stroke="#1e2330"/>
+  <text x="106" y="414" fill="#e6e6e6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">Bullet gunslinger</text>
+  <text x="106" y="434" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44% of your games are bullet</text>
+
+  <rect x="444" y="388" width="340" height="58" rx="10" fill="#0b0d11" stroke="#1e2330"/>
+  <text x="462" y="414" fill="#e6e6e6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">Hands-on attacker</text>
+  <text x="462" y="434" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">Capture or check on 32% of moves</text>
+
+  <rect x="800" y="388" width="392" height="58" rx="10" fill="#0b0d11" stroke="#1e2330"/>
+  <text x="818" y="414" fill="#e6e6e6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">Mate hunter</text>
+  <text x="818" y="434" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">1,751 checkmates across wins</text>
+
+  <!-- meters -->
+  <text x="88" y="490" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Aggression</text>
+  <text x="600" y="490" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">61</text>
+  <rect x="88" y="500" width="512" height="8" rx="4" fill="#1e2330"/>
+  <rect x="88" y="500" width="312" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="668" y="490" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Tactics vs Strategy</text>
+  <text x="1192" y="490" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">85</text>
+  <rect x="668" y="500" width="524" height="8" rx="4" fill="#1e2330"/>
+  <rect x="668" y="500" width="445" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="88" y="548" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Pace</text>
+  <text x="600" y="548" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">98</text>
+  <rect x="88" y="558" width="512" height="8" rx="4" fill="#1e2330"/>
+  <rect x="88" y="558" width="504" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="668" y="548" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Breadth</text>
+  <text x="1192" y="548" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">100</text>
+  <rect x="668" y="558" width="524" height="8" rx="4" fill="#1e2330"/>
+  <rect x="668" y="558" width="524" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="88" y="606" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Decisiveness</text>
+  <text x="600" y="606" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">95</text>
+  <rect x="88" y="616" width="512" height="8" rx="4" fill="#1e2330"/>
+  <rect x="88" y="616" width="488" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="668" y="606" fill="#8b93a7" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Endgame reach</text>
+  <text x="1192" y="606" text-anchor="end" fill="#b07d2e" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">37</text>
+  <rect x="668" y="616" width="524" height="8" rx="4" fill="#1e2330"/>
+  <rect x="668" y="616" width="194" height="8" rx="4" fill="url(#g)"/>
+
+  <text x="640" y="660" text-anchor="middle" fill="#5b6172" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Example report card · chess-signature.streamlit.app</text>
+</svg>
