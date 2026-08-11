@@ -11,7 +11,7 @@ Paste one or more usernames, wait for the fetch, get a full HTML report you can 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmed5145/chess_signature/actions/workflows/ci.yml)
 
-![Chess Signature personality card preview](docs/preview.svg)
+![Chess Signature personality card preview](docs/preview.png)
 
 ## What you get
 

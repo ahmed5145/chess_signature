@@ -1,5 +1,5 @@
 # Docs assets
 
-- `preview.svg` — README hero preview (matches the report personality card)
-- Optional: upload `preview.svg` or a PNG export as the GitHub
-  **Settings → General → Social preview** image
+- `preview.png` — README hero preview (use PNG; GitHub often blanks SVGs)
+- `preview.svg` — vector source of the same card
+- Optional: upload `preview.png` under GitHub **Settings → General → Social preview**
