@@ -11,6 +11,8 @@ from fetch_games import fetch_all
 from make_signature import build_html_pair
 
 MAX_ACCOUNTS = 6
+PUBLIC_APP_URL = "https://chess-signature.streamlit.app"
+SHARE_PARAM = "s"
 
 PAGE_CSS = """
 <style>
@@ -89,6 +91,20 @@ PAGE_CSS = """
   }
   .cs-footer a { color: #8b93a7; text-decoration: none; }
   .cs-footer a:hover { color: #b07d2e; }
+  .cs-share {
+    background: #13161d;
+    border: 1px solid #2a3142;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    margin: 0.75rem 0 1rem 0;
+  }
+  .cs-share-label {
+    color: #8b93a7;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.35rem;
+  }
 
   /* Tighter, quieter form controls */
   div[data-testid="stTextInput"] label {
@@ -175,6 +191,48 @@ def render_hero():
     )
 
 
+def render_share_panel(url: str, preview_mode: bool = False):
+    title = "Shared preview link" if preview_mode else "Share this report"
+    st.markdown(
+        f'<div class="cs-share"><div class="cs-share-label">{title}</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Anyone with this link can open the cached report in preview mode "
+        "(about 6 hours while the server cache holds it)."
+    )
+    st.code(url, language=None)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.link_button("Open share link", url, use_container_width=True)
+    with c2:
+        # Small clipboard helper; falls back to selecting the code block above.
+        safe = url.replace("\\", "\\\\").replace("`", "\\`").replace("</", "<\\/")
+        components.html(
+            f"""
+            <button id="cs-copy"
+              style="width:100%;height:38px;border-radius:8px;border:1px solid #2a3142;
+                     background:#13161d;color:#e6e6e6;cursor:pointer;font-size:14px;">
+              Copy link
+            </button>
+            <script>
+              const btn = document.getElementById("cs-copy");
+              const url = `{safe}`;
+              btn.addEventListener("click", async () => {{
+                try {{
+                  await navigator.clipboard.writeText(url);
+                  btn.textContent = "Copied";
+                  setTimeout(() => btn.textContent = "Copy link", 1500);
+                }} catch (e) {{
+                  btn.textContent = "Select link above";
+                }}
+              }});
+            </script>
+            """,
+            height=50,
+        )
+
+
 def main():
     st.set_page_config(
         page_title="Chess Signature",
@@ -192,6 +250,43 @@ def main():
     )
     st.markdown(PAGE_CSS, unsafe_allow_html=True)
     render_hero()
+
+    if "report_cache" not in st.session_state:
+        st.session_state.report_cache = {}
+    if "generated_cids" not in st.session_state:
+        st.session_state.generated_cids = set()
+
+    # Shared preview: /?s=<cache_id>
+    share_id = st.query_params.get(SHARE_PARAM, "")
+    if isinstance(share_id, list):
+        share_id = share_id[0] if share_id else ""
+    share_id = (share_id or "").strip().lower()
+    preview_mode = False
+    active = None
+    cache_note = None
+    active_share_id = None
+
+    if share_id and report_cache.is_valid_share_id(share_id):
+        shared = report_cache.load_report(share_id)
+        if shared is not None:
+            active = shared
+            active_share_id = share_id
+            st.session_state["active_key"] = ("share", share_id)
+            st.session_state["active_share_id"] = share_id
+            st.session_state.report_cache[("share", share_id)] = shared
+            # Visitors (never generated this id here) get preview chrome.
+            preview_mode = share_id not in st.session_state.generated_cids
+            if preview_mode:
+                st.info(
+                    "Preview mode: you are viewing a shared report. "
+                    "Use the form below to generate your own."
+                )
+        else:
+            st.warning(
+                "This share link expired or is not on this server anymore "
+                "(cache lasts about 6 hours, and redeploys clear it). "
+                "Ask them to generate again and resend the link."
+            )
 
     chesscom_raw = st.text_input(
         "Chess.com usernames",
@@ -223,21 +318,17 @@ def main():
             help="Bypass the shared server cache and fetch games again.",
         )
 
-    if "report_cache" not in st.session_state:
-        st.session_state.report_cache = {}
-
     generate = st.button("Generate report", type="primary")
     st.markdown(
         '<p class="cs-note">Large accounts can take a few minutes on first run. '
         "Repeat lookups for the same usernames reuse a server cache for about "
-        "6 hours. Times are UTC. Style matches are for fun, not engine strength.</p>",
+        "6 hours. Share links open that cached report in preview mode. "
+        "Times are UTC. Style matches are for fun, not engine strength.</p>",
         unsafe_allow_html=True,
     )
 
     chesscom = parse_usernames(chesscom_raw)
     lichess = parse_usernames(lichess_raw)
-    active = None
-    cache_note = None
 
     if generate:
         if not chesscom and not lichess:
@@ -311,20 +402,38 @@ def main():
             cache_note = "Fetched fresh and saved to server cache."
         elif cache_note is None:
             cache_note = "Using cached report for this username set (this session)."
+            # Ensure disk has it so share links work even after session-only hit.
+            if report_cache.load_report(cid) is None:
+                report_cache.save_report(cid, cached)
 
         st.session_state["active_key"] = key
+        st.session_state["active_share_id"] = cid
+        st.session_state.generated_cids.add(cid)
+        # Put share id in the URL so refresh/copy-from-address-bar works.
+        st.query_params[SHARE_PARAM] = cid
         active = cached
+        active_share_id = cid
+        preview_mode = False
 
-    elif st.session_state.get("active_key") in st.session_state.report_cache:
+    elif active is None and st.session_state.get("active_key") in st.session_state.report_cache:
         active = st.session_state.report_cache[st.session_state["active_key"]]
+        active_share_id = st.session_state.get("active_share_id")
 
     if active:
         games = active["games"]
-        if cache_note:
+        if preview_mode:
+            st.caption("Shared preview (read-only cache). Generate your own with the form above.")
+        elif cache_note:
             st.caption(cache_note)
+
+        if active_share_id:
+            url = report_cache.share_url(active_share_id, PUBLIC_APP_URL)
+            render_share_panel(url, preview_mode=preview_mode)
+
         top_l, top_r = st.columns([3, 1])
         with top_l:
-            st.success(f"Report ready from {len(games):,} games.")
+            label = "Shared report" if preview_mode else "Report ready"
+            st.success(f"{label} from {len(games):,} games.")
         with top_r:
             st.download_button(
                 "Download HTML",

@@ -98,3 +98,14 @@ def clear_report(cid: str) -> None:
         _path_for(cid).unlink(missing_ok=True)
     except OSError:
         pass
+
+
+def is_valid_share_id(cid: str) -> bool:
+    if not cid or len(cid) > 64:
+        return False
+    return all(c in "0123456789abcdef" for c in cid.lower())
+
+
+def share_url(cid: str, base_url: str) -> str:
+    base = (base_url or "").rstrip("/")
+    return f"{base}/?s={cid}"
